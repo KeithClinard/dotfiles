@@ -35,3 +35,24 @@ gnew() {
   git checkout -b $branchName
   git push --set-upstream origin $branchName
 }
+
+############################
+# Move uncommitted git changes to new branch off updated main
+# Optionally commit and push the changes
+############################
+gmovebranch() {
+  local branchName=$1
+  local commitmessage=$2
+  git stash push --include-untracked
+  git checkout main
+  gbail
+  gup
+  gnew $branchName
+  git stash pop
+  if [[ -n $commitmessage ]]; then
+    git add .
+    git commit -m "$commitmessage"
+    git push
+    gh
+  fi
+}
