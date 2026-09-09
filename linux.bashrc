@@ -8,7 +8,7 @@ alias e="explorer.exe ."
 ############################
 # Open current repo in github
 ############################
-gh() {
+gopen() {
   local remote=$(git remote -v | head -n 1 | awk -F " " '{print $2}' | sed 's/.git$//g')
   if [[ "$remote" == *@* ]]; then
     remote=$(echo $remote | awk -F "@" '{print $2}' | sed 's/:/\//g' | awk '{print "https://"$1}')
