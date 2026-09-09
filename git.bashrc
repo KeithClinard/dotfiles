@@ -53,6 +53,6 @@ gmovebranch() {
     git add .
     git commit -m "$commitmessage"
     git push
-    gh
+    gopen
   fi
 }
