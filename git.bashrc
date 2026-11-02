@@ -176,7 +176,11 @@ gwtclean() {
     [[ "$remote" == origin && "$track" == "[gone]" ]] || continue
     if worktree_path=$(_gwt_branch_path "$branch"); then
       printf 'Removing worktree for %s: %s\n' "$branch" "$worktree_path"
-      gwtr "$branch" || result=1
+      if gwtr "$branch"; then
+        git branch -D -- "$branch" || result=1
+      else
+        result=1
+      fi
     fi
   done <<< "$branches"
   return "$result"

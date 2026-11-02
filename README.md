@@ -35,7 +35,7 @@ Repository directory names should be unique within this shared location.
 | `gwtnew <branch> [start-ref]` | Create a branch and worktree, attempt to push, then open a new VS Code window. |
 | `gwta <branch>` | Add a worktree for an existing local branch and open a new VS Code window. |
 | `gwtr <branch>` | Remove the branch's worktree, preserving the branch. |
-| `gwtclean` | Fetch and prune origin, then remove worktrees whose branches have missing upstreams on origin. |
+| `gwtclean` | Fetch and prune origin, then remove worktrees whose branches have missing upstreams on origin and delete their local branches. |
 
 For example, from your original clone or any of its linked worktrees:
 
@@ -68,11 +68,15 @@ configured upstream on `origin` is gone. It first runs `git fetch origin --prune
 and stops without removing anything if fetching fails. It prints each selected
 branch and its registered worktree path, then calls `gwtr` without prompting.
 Branches with live upstreams, no upstream, or upstreams on other remotes are left
-alone. Local branches are preserved; a subsequent `gup` can delete them.
+alone. After each successful worktree removal, its local branch is deleted with
+`git branch -D`, matching `gup`'s force-delete policy even for unmerged branches.
+If worktree removal fails, its branch is preserved. `gwtr` used directly still
+preserves local branches.
 
 The same removal protections apply: dirty, locked, original, and current worktrees
-remain protected. Cleanup continues if a removal fails and returns nonzero if any
-removal failed. No eligible worktrees is a successful result.
+remain protected. Cleanup continues if a worktree removal or branch deletion
+fails and returns nonzero if either operation failed. No eligible worktrees is a
+successful result.
 
 Dependencies and build artifacts must be installed separately in each worktree
 as needed. These helpers support non-bare repositories.
