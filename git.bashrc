@@ -162,6 +162,26 @@ gwtr() {
   git worktree remove -- "$worktree_path"
 }
 
+gwtclean() {
+  if [[ $# -ne 0 ]]; then
+    printf 'Usage: gwtclean\n' >&2
+    return 1
+  fi
+  git fetch origin --prune || return
+
+  local branches branch remote track worktree_path
+  local result=0
+  branches=$(git for-each-ref --format='%(refname:lstrip=2) %(upstream:remotename) %(upstream:track)' refs/heads) || return
+  while read -r branch remote track; do
+    [[ "$remote" == origin && "$track" == "[gone]" ]] || continue
+    if worktree_path=$(_gwt_branch_path "$branch"); then
+      printf 'Removing worktree for %s: %s\n' "$branch" "$worktree_path"
+      gwtr "$branch" || result=1
+    fi
+  done <<< "$branches"
+  return "$result"
+}
+
 ############################
 # Create new branch and push to github
 ############################
